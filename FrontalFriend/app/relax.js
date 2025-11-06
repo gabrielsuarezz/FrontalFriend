@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Video, Audio } from 'expo-av';
+import { VideoView, useVideoPlayer } from 'expo-video';
+import { useAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { MEDIA_CATEGORIES, AUDIO_TRACKS, THEME_COLORS } from '../constants/media';
 import { resolveRemoteUri } from '../constants/mediaUtils';
 
@@ -17,36 +18,89 @@ const { width, height } = Dimensions.get('window');
 
 export default function RelaxScreen() {
   const router = useRouter();
-  const videoRef = useRef(null);
-  const soundRef = useRef(null);
 
   const [selectedCategory, setSelectedCategory] = useState(MEDIA_CATEGORIES[0]);
   const [selectedVideo, setSelectedVideo] = useState(MEDIA_CATEGORIES[0].videos[0]);
-  const [selectedAudio, setSelectedAudio] = useState(AUDIO_TRACKS[0]);
+  const [selectedAudio, setSelectedAudio] = useState(
+    AUDIO_TRACKS.find(track => track.category === MEDIA_CATEGORIES[0].id) || AUDIO_TRACKS[0]
+  );
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [videoUri, setVideoUri] = useState(MEDIA_CATEGORIES[0].videos[0].uri);
   const [videoUnavailable, setVideoUnavailable] = useState(false);
-  const [soundUnavailable, setSoundUnavailable] = useState(false);
+  const [audioUri, setAudioUri] = useState(
+    AUDIO_TRACKS.find(track => track.category === MEDIA_CATEGORIES[0].id)?.uri || AUDIO_TRACKS[0].uri
+  );
+  const [audioUnavailable, setAudioUnavailable] = useState(false);
+
+  const availableAudioTracks = AUDIO_TRACKS.filter(
+    track => track.category === selectedCategory.id
+  );
+
+  const videoPlayer = useVideoPlayer(MEDIA_CATEGORIES[0].videos[0].uri, (player) => {
+    player.loop = true;
+    player.muted = true;
+  });
+
+  const audioPlayer = useAudioPlayer(
+    AUDIO_TRACKS.find(track => track.category === MEDIA_CATEGORIES[0].id)?.uri || AUDIO_TRACKS[0].uri
+  );
 
   useEffect(() => {
-    setupAudio();
-    return () => {
-      cleanupMedia();
+    const configureAudio = async () => {
+      try {
+        await setAudioModeAsync({
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: false,
+        });
+      } catch (error) {
+        console.error('Error configuring audio mode:', error);
+      }
     };
+
+    configureAudio();
   }, []);
 
-  // Resolve the selectedVideo URI and set a fallback state if unreachable
+  useEffect(() => {
+    if (audioPlayer) {
+      audioPlayer.loop = true;
+      audioPlayer.volume = 1.0;
+    }
+  }, [audioPlayer]);
+
+  useEffect(() => {
+    return () => {
+      if (videoPlayer) {
+        videoPlayer.pause();
+      }
+      if (audioPlayer) {
+        audioPlayer.pause();
+      }
+    };
+  }, [videoPlayer, audioPlayer]);
+
   useEffect(() => {
     let mounted = true;
     (async () => {
       setIsLoading(true);
+      setIsPlaying(false);
+
       try {
         const resolved = await resolveRemoteUri(selectedVideo.uri, { timeout: 3000, fallback: null });
         if (!mounted) return;
+
         if (resolved) {
           setVideoUri(resolved);
           setVideoUnavailable(false);
+
+          if (videoPlayer) {
+            try {
+              videoPlayer.replace(resolved);
+            } catch (err) {
+              console.error('Error replacing video source:', err);
+              setVideoUnavailable(true);
+            }
+          }
         } else {
           setVideoUri(null);
           setVideoUnavailable(true);
@@ -64,203 +118,93 @@ export default function RelaxScreen() {
     return () => {
       mounted = false;
     };
-  }, [selectedVideo]);
+  }, [selectedVideo, videoPlayer]);
 
-  const setupAudio = async () => {
-    try {
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: false,
-        playsInSilentModeIOS: true,
-        staysActiveInBackground: true,
-        shouldDuckAndroid: true,
-      });
-    } catch (error) {
-      console.error('Error setting up audio:', error);
-    }
-  };
-
-  // Load and manage audio programmatically using Audio.Sound
   useEffect(() => {
-    let mounted = true;
-    const loadSound = async () => {
-      setIsLoading(true);
-      try {
-        // unload previous
-        if (soundRef.current) {
-          try {
-            await soundRef.current.unloadAsync();
-          } catch (e) {
-            // ignore
-          }
-          soundRef.current = null;
-        }
+    if (isPlaying && !videoUnavailable && videoPlayer) {
+      videoPlayer.play();
+    } else if (videoPlayer) {
+      videoPlayer.pause();
+    }
+  }, [isPlaying, videoPlayer, videoUnavailable]);
 
-        const resolved = await resolveRemoteUri(selectedAudio.uri, { timeout: 3000, fallback: null });
-        if (!resolved) {
-          // Mark unavailable and skip loading
-          setSoundUnavailable(true);
-          return;
+  useEffect(() => {
+    const controlAudio = async () => {
+      if (isPlaying && audioPlayer) {
+        try {
+          await audioPlayer.play();
+          console.log('Audio playing:', selectedAudio.title);
+        } catch (err) {
+          console.error('Error playing audio:', err);
         }
-        setSoundUnavailable(false);
-
-        const result = await Audio.Sound.createAsync(
-          { uri: resolved },
-          { isLooping: true, shouldPlay: isPlaying }
-        );
-        if (!mounted) {
-          // In case component unmounted while loading
-          try {
-            result.sound.unloadAsync();
-          } catch (e) {}
-          return;
+      } else if (audioPlayer) {
+        try {
+          await audioPlayer.pause();
+        } catch (err) {
+          console.error('Error pausing audio:', err);
         }
-        soundRef.current = result.sound;
-      } catch (error) {
-        console.error('Error loading sound:', error);
-      } finally {
-        if (mounted) setIsLoading(false);
       }
     };
 
-    loadSound();
+    controlAudio();
+  }, [isPlaying, audioPlayer, selectedAudio.title]);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const changeAudio = async () => {
+      if (!selectedAudio) return;
+
+      setIsPlaying(false);
+
+      try {
+        console.log('Loading audio:', selectedAudio.title, selectedAudio.uri);
+
+        if (!mounted) return;
+
+        setAudioUri(selectedAudio.uri);
+        setAudioUnavailable(false);
+
+        if (audioPlayer) {
+          try {
+            await audioPlayer.pause();
+            audioPlayer.replace(selectedAudio.uri);
+            console.log('Audio source changed to:', selectedAudio.title);
+          } catch (err) {
+            console.error('Error replacing audio source:', err, selectedAudio.uri);
+            setAudioUnavailable(true);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading audio:', err);
+        if (mounted) {
+          setAudioUri(null);
+          setAudioUnavailable(true);
+        }
+      }
+    };
+
+    changeAudio();
 
     return () => {
       mounted = false;
-      (async () => {
-        if (soundRef.current) {
-          try {
-            await soundRef.current.unloadAsync();
-          } catch (e) {
-            // ignore
-          }
-          soundRef.current = null;
-        }
-      })();
     };
-  }, [selectedAudio]);
+  }, [selectedAudio, audioPlayer]);
 
-  // Sync playing state to the loaded sound when only isPlaying changes
-  useEffect(() => {
-    const syncPlay = async () => {
-      if (!soundRef.current) return;
-      try {
-        if (isPlaying) {
-          await soundRef.current.playAsync();
-        } else {
-          await soundRef.current.pauseAsync();
-        }
-      } catch (error) {
-        console.error('Error syncing sound play state:', error);
-      }
-    };
-    syncPlay();
-  }, [isPlaying]);
-
-  const cleanupMedia = async () => {
-    try {
-      if (videoRef.current) {
-        await videoRef.current.stopAsync();
-        await videoRef.current.unloadAsync();
-      }
-      if (soundRef.current) {
-        try {
-          await soundRef.current.stopAsync();
-        } catch (e) {
-          // ignore already-stopped
-        }
-        await soundRef.current.unloadAsync();
-        soundRef.current = null;
-      }
-    } catch (error) {
-      console.error('Error cleaning up media:', error);
+  const handlePlayPause = () => {
+    if (videoUnavailable || audioUnavailable) {
+      console.warn('Cannot play: Video or audio unavailable');
+      return;
     }
+    setIsPlaying(!isPlaying);
   };
 
-  const handlePlayPause = async () => {
-    try {
-      setIsLoading(true);
-      if (isPlaying) {
-        // Let Video's shouldPlay control playback; only control audio programmatically
-        if (soundRef.current) {
-          try {
-            await soundRef.current.pauseAsync();
-          } catch (e) {
-            console.error('Error pausing sound:', e);
-          }
-        }
-        setIsPlaying(false);
-      } else {
-        if (soundRef.current) {
-          try {
-            await soundRef.current.playAsync();
-          } catch (e) {
-            console.error('Error playing sound:', e);
-          }
-        }
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.error('Error toggling playback:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleVideoChange = (video) => {
+    setSelectedVideo(video);
   };
 
-  const handleVideoChange = async (video) => {
-    try {
-      setIsLoading(true);
-      // Clean up existing video first to avoid overlapping load/unload
-      if (videoRef.current) {
-        try {
-          await videoRef.current.stopAsync();
-        } catch (e) {
-          // ignore if already stopped
-        }
-        try {
-          await videoRef.current.unloadAsync();
-        } catch (e) {
-          console.error('Error unloading previous video:', e);
-        }
-      }
-      if (isPlaying) {
-        setIsPlaying(false);
-      }
-      // Only set selected after cleanup completes
-      setSelectedVideo(video);
-    } catch (error) {
-      console.error('Error changing video:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAudioChange = async (audio) => {
-    try {
-      setIsLoading(true);
-      // Clean up existing sound first to avoid overlapping load/unload
-      if (soundRef.current) {
-        try {
-          await soundRef.current.stopAsync();
-        } catch (e) {
-          // ignore
-        }
-        try {
-          await soundRef.current.unloadAsync();
-        } catch (e) {
-          console.error('Error unloading previous sound:', e);
-        }
-        soundRef.current = null;
-      }
-      if (isPlaying) {
-        setIsPlaying(false);
-      }
-      // Only set selected after cleanup completes
-      setSelectedAudio(audio);
-    } catch (error) {
-      console.error('Error changing audio:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleAudioChange = (audio) => {
+    setSelectedAudio(audio);
   };
 
   const handleCategoryChange = (category) => {
@@ -268,25 +212,26 @@ export default function RelaxScreen() {
     if (category.videos.length > 0) {
       handleVideoChange(category.videos[0]);
     }
+    const categoryAudio = AUDIO_TRACKS.find(track => track.category === category.id);
+    if (categoryAudio) {
+      handleAudioChange(categoryAudio);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.videoContainer}>
         {videoUri && !videoUnavailable ? (
-          <Video
-            ref={videoRef}
-            source={{ uri: videoUri }}
+          <VideoView
+            player={videoPlayer}
             style={styles.video}
-            resizeMode="cover"
-            isLooping
-            shouldPlay={isPlaying}
-            isMuted
+            contentFit="cover"
+            nativeControls={false}
           />
         ) : (
           <View style={[styles.video, styles.videoPlaceholder]}>
             <Text style={styles.placeholderText}>
-              Scene unavailable — unable to load remote video. Try a different scene.
+              Scene unavailable. Try a different scene.
             </Text>
           </View>
         )}
@@ -358,9 +303,14 @@ export default function RelaxScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Music</Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Music</Text>
+              {audioUnavailable && (
+                <Text style={styles.statusWarning}>Audio unavailable</Text>
+              )}
+            </View>
             <View style={styles.buttonRow}>
-              {AUDIO_TRACKS.map((audio) => (
+              {availableAudioTracks.map((audio) => (
                 <TouchableOpacity
                   key={audio.id}
                   style={[
@@ -380,20 +330,26 @@ export default function RelaxScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-            {soundUnavailable && (
-              <Text style={styles.unavailableText}>
-                Audio unavailable — unable to load remote track. Try a different
-                track.
-              </Text>
-            )}
           </View>
         </ScrollView>
 
         <View style={styles.playControlContainer}>
+          {(videoUnavailable || audioUnavailable) && (
+            <Text style={styles.unavailableText}>
+              {videoUnavailable && audioUnavailable
+                ? 'Video and audio unavailable. Try different selections.'
+                : videoUnavailable
+                ? 'Video unavailable. Try a different scene.'
+                : 'Audio unavailable. Try a different track.'}
+            </Text>
+          )}
           <TouchableOpacity
-            style={styles.playButton}
+            style={[
+              styles.playButton,
+              (videoUnavailable || audioUnavailable) && styles.playButtonDisabled,
+            ]}
             onPress={handlePlayPause}
-            disabled={isLoading}
+            disabled={isLoading || videoUnavailable || audioUnavailable}
           >
             {isLoading ? (
               <ActivityIndicator size="large" color={THEME_COLORS.text.light} />
@@ -403,8 +359,6 @@ export default function RelaxScreen() {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Audio is loaded and controlled programmatically via Audio.Sound (soundRef) */}
     </View>
   );
 }
@@ -477,11 +431,21 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 24,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: THEME_COLORS.text.primary,
-    marginBottom: 12,
+  },
+  statusWarning: {
+    fontSize: 12,
+    color: '#E74C3C',
+    fontWeight: '500',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -528,11 +492,6 @@ const styles = StyleSheet.create({
   optionButtonTextActive: {
     color: THEME_COLORS.text.light,
   },
-  unavailableText: {
-    marginTop: 8,
-    color: THEME_COLORS.text.primary,
-    fontStyle: 'italic',
-  },
   playControlContainer: {
     position: 'absolute',
     bottom: 0,
@@ -543,6 +502,13 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
   },
+  unavailableText: {
+    fontSize: 14,
+    color: '#E74C3C',
+    textAlign: 'center',
+    marginBottom: 12,
+    fontWeight: '500',
+  },
   playButton: {
     backgroundColor: THEME_COLORS.primary,
     paddingVertical: 16,
@@ -550,6 +516,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 56,
+  },
+  playButtonDisabled: {
+    backgroundColor: THEME_COLORS.button.inactive,
+    opacity: 0.5,
   },
   playButtonText: {
     fontSize: 18,
