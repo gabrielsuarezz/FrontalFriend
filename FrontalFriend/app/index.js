@@ -38,6 +38,20 @@ export default function HomeScreen() {
         >
           <Text style={styles.buttonText}>Physical Health</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push('/contact')}
+        >
+          <Text style={styles.buttonText}>Contact</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push('/important-documents')}
+        >
+          <Text style={styles.buttonText}>Important Documents</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

@@ -10,6 +10,8 @@ export default function RootLayout() {
         <Stack.Screen name="relax" />
         <Stack.Screen name="reminders" />
         <Stack.Screen name="physical-health" />
+        <Stack.Screen name="contact" />
+        <Stack.Screen name="important-documents" />
       </Stack>
       <StatusBar style="auto" />
     </>
