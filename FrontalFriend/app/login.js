@@ -46,7 +46,6 @@ const Login = () => {
     try {
       const response = await signInWithEmailAndPassword(auth, email, password);
       console.log('User signed in successfully:', response.user);
-      //alert('Login Successful!');
       if (rememberMeEnabled === true) {
         await save('remember-me', 'true');
         await save('password', password);
