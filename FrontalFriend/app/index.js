@@ -62,7 +62,7 @@ export default function HomeScreen() {
         <View style={styles.cardsGrid}>
           <TouchableOpacity
             style={styles.card}
-            onPress={() => router.push('/chat')}
+            onPress={() => router.push('/consent')}
           >
             <View style={styles.iconPlaceholder}>
               <Text style={styles.iconText}>💬</Text>
