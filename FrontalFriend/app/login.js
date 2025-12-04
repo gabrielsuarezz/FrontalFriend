@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Switch, StyleSheet, Text, View, TextInput, Button, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
+import { Switch, StyleSheet, Text, View, TextInput, Button, ActivityIndicator, KeyboardAvoidingView, Image } from 'react-native';
 import { FIREBASE_AUTH } from '../FirebaseConfig';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail} from 'firebase/auth';
 import { useRouter } from 'expo-router';
@@ -119,7 +119,19 @@ const Login = () => {
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
-      <Text style={styles.h1}>FrontalFriend 🧠</Text>
+      {/* Background */}
+  <Text style={styles.brain1}>🧠</Text>
+  <Text style={styles.brain2}>🧠</Text>
+      
+      <View style={styles.logoContainer}>
+            <Image 
+            source={require('../assets/images/gradBrainnobg.png')}
+            style={styles.logo}
+            resizeMode="contain"
+            />
+      </View>
+      
+      <Text style={styles.h1}>FrontalFriend</Text>
       
       <TextInput
         value={email}
@@ -188,4 +200,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
+  logoContainer: {
+  width: 100,
+  height: 100,
+  borderRadius: 50,
+  backgroundColor: '#fff',   // optional circle background
+  justifyContent: 'center',
+  alignItems: 'center',
+  alignSelf: 'center',
+  marginBottom: 20,
+  overflow: 'hidden',        // makes the image fit inside circle
+},
+
+logo: {
+  width: 90,
+  height: 90,
+},
+brain1: {
+  position: 'absolute',
+  fontSize: 250,
+  opacity: 0.48,
+  top: -40,
+  left: -20,
+},
+
+brain2: {
+  position: 'absolute',
+  fontSize: 250,
+  opacity: 0.48,
+  bottom: -40,
+  right: -20,
+},
 });
