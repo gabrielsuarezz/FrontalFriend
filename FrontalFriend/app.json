@@ -4,7 +4,7 @@
     "slug": "FrontalFriend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/gradBrainnobg.png",
     "scheme": "frontalfriend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -24,7 +24,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/gradBrainnobg.png"
     },
     "plugins": [
       "expo-router",
