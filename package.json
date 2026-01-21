@@ -1,14 +1,10 @@
 {
   "dependencies": {
-    "expo": "^54.0.13",
-    "firebase": "^12.4.0",
-    "react": "^19.2.0",
-    "react-native": "^0.82.0"
+    "expo": "^54.0.25",
+    "firebase": "^12.4.0"
   },
-  "name": "AIHealthApp",
-  "version": "1.0.0",
-  "scripts": {
-    "android": "expo run:android",
-    "ios": "expo run:ios"
+  "devDependencies": {
+    "@types/react": "~19.1.10",
+    "typescript": "~5.9.2"
   }
 }
