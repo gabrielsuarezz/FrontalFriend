@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FrontalFriend - Mental Health Support</title>
+    <title>FrontalFriend - Mental Health Support App</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+
         * {
             margin: 0;
             padding: 0;
@@ -12,387 +14,539 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background-color: #F5F7FA;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            overflow-x: hidden;
         }
 
-        .phone-frame {
-            width: 100%;
-            max-width: 400px;
-            height: 90vh;
-            max-height: 844px;
-            background: #F5F7FA;
-            border-radius: 40px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
-        .header {
-            background: linear-gradient(135deg, #3B7EBF 0%, #2E6BA8 100%);
-            padding: 60px 20px 10px 20px;
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 60px;
             color: white;
+            position: relative;
         }
 
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: float 6s ease-in-out infinite;
         }
 
-        .greeting {
-            font-size: 32px;
-            font-weight: bold;
-            color: #FFFFFF;
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
         }
 
-        .logout {
-            color: #fff;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            opacity: 0.9;
+        .hero h1 {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out;
         }
 
-        .logout:hover {
-            opacity: 1;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .divider {
-            height: 2px;
-            background-color: #000;
-            margin: 8px 0;
-            opacity: 0.3;
-        }
-
-        .welcome-message {
-            font-size: 16px;
-            color: #FFFFFF;
-            line-height: 24px;
+        .hero .subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
             opacity: 0.95;
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
         }
 
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 40px;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .card {
-            background-color: #FFFFFF;
-            border-radius: 16px;
-            padding: 20px;
-            aspect-ratio: 1;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            text-decoration: none;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        }
-
-        .icon-placeholder {
-            width: 60px;
-            height: 60px;
+        .hero .tagline {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 30px;
             border-radius: 30px;
-            background-color: #E8F4F8;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
         }
 
-        .icon-text {
-            font-size: 28px;
+        /* Main Content */
+        .content {
+            background: white;
+            border-radius: 40px 40px 0 0;
+            padding: 60px 40px;
+            position: relative;
+            box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.2);
         }
 
-        .card-title {
-            font-size: 16px;
+        .section {
+            margin-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
             font-weight: 700;
-            color: #1E3A5F;
-            margin-bottom: 6px;
-            text-align: center;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+            position: relative;
+            display: inline-block;
         }
 
-        .card-description {
-            font-size: 12px;
-            color: #6B7280;
-            text-align: center;
-            line-height: 16px;
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
         }
 
-        .footer {
-            background: #FFFFFF;
-            padding: 20px;
-            text-align: center;
-            border-top: 1px solid #E5E7EB;
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 40px;
+            max-width: 700px;
         }
 
-        .footer-text {
-            font-size: 12px;
-            color: #6B7280;
-            margin-bottom: 8px;
+        /* Feature Cards Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
         }
 
-        .footer a {
-            color: #3B7EBF;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
+        .feature-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            cursor: pointer;
         }
 
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 480px) {
-            .phone-frame {
-                height: 100vh;
-                max-height: none;
-                border-radius: 0;
-            }
-
-            body {
-                padding: 0;
-            }
-
-            .greeting {
-                font-size: 28px;
-            }
-
-            .welcome-message {
-                font-size: 14px;
-            }
-        }
-
-        /* Custom scrollbar */
-        .content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: 3px;
-        }
-
-        .content::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
+        .feature-card::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            font-size: 2.5rem;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
 
-        .modal.active {
-            display: flex;
+        .feature-card:hover .feature-icon {
+            animation: bounce 0.6s ease;
         }
 
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        .modal-content h2 {
-            color: #3B7EBF;
+        .feature-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a1a1a;
             margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
         }
 
-        .modal-content p {
-            color: #6B7280;
-            margin-bottom: 20px;
+        .feature-description {
+            font-size: 1rem;
+            color: #666;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
         }
 
-        .modal-button {
-            background: #3B7EBF;
+        /* Tech Stack */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
             font-weight: 600;
-            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+            cursor: default;
         }
 
-        .modal-button:hover {
-            background: #2E6BA8;
+        .tech-badge:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* CTA Button */
+        .cta-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8ecff 100%);
+            border-radius: 30px;
+            margin-top: 60px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 700;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 50px rgba(102, 126, 234, 0.5);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+        }
+
+        .footer-text {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .footer-links {
+            margin-top: 20px;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 0.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero .subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 40px 20px;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .stagger-1 { animation-delay: 0.1s; }
+        .stagger-2 { animation-delay: 0.2s; }
+        .stagger-3 { animation-delay: 0.3s; }
+        .stagger-4 { animation-delay: 0.4s; }
+        .stagger-5 { animation-delay: 0.5s; }
+        .stagger-6 { animation-delay: 0.6s; }
+
+        /* Decorative Elements */
+        .decorative-circle {
+            position: fixed;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: 20%;
+            right: -100px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            bottom: 10%;
+            left: -150px;
+            animation: float 10s ease-in-out infinite reverse;
         }
     </style>
 </head>
 <body>
-    <div class="phone-frame">
-        <div class="header">
-            <div class="header-row">
-                <div class="greeting">Hi Friend!</div>
-                <div class="logout" onclick="showModal('logout')">Logout</div>
-            </div>
+    <div class="decorative-circle circle-1"></div>
+    <div class="decorative-circle circle-2"></div>
 
-            <div class="divider"></div>
-
-            <div class="welcome-message">
-                Welcome! We're glad you're here. How do you want to improve your mental health today?
-            </div>
+    <div class="container">
+        <div class="hero">
+            <h1>FrontalFriend</h1>
+            <p class="subtitle">Your Personal Mental Health Companion</p>
+            <div class="tagline">Built with React Native & Powered by AI</div>
         </div>
 
         <div class="content">
-            <div class="cards-grid">
-                <div class="card" onclick="showModal('chat')">
-                    <div class="icon-placeholder">
-                        <div class="icon-text">💬</div>
-                    </div>
-                    <div class="card-title">Chat</div>
-                    <div class="card-description">Talk with AI for emotional support</div>
-                </div>
+            <div class="section">
+                <h2 class="section-title">About the Project</h2>
+                <p class="section-subtitle">
+                    FrontalFriend is a comprehensive mental health support mobile application that combines cutting-edge AI technology
+                    with thoughtful wellness features to provide users with accessible emotional support, stress relief, and health tracking.
+                </p>
 
-                <div class="card" onclick="showModal('relax')">
-                    <div class="icon-placeholder">
-                        <div class="icon-text">🧘</div>
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">6</div>
+                        <div class="stat-label">Core Features</div>
                     </div>
-                    <div class="card-title">Relax</div>
-                    <div class="card-description">Calm your mind with grounding videos</div>
+                    <div class="stat-card">
+                        <div class="stat-number">11+</div>
+                        <div class="stat-label">Technologies</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Platforms</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Open Source</div>
+                    </div>
                 </div>
+            </div>
 
-                <div class="card" onclick="showModal('reminders')">
-                    <div class="icon-placeholder">
-                        <div class="icon-text">⏰</div>
-                    </div>
-                    <div class="card-title">Reminders</div>
-                    <div class="card-description">Stay on track with alerts</div>
-                </div>
+            <div class="section">
+                <h2 class="section-title">Features</h2>
+                <p class="section-subtitle">
+                    A comprehensive suite of tools designed to support mental wellness and personal growth.
+                </p>
 
-                <div class="card" onclick="showModal('health')">
-                    <div class="icon-placeholder">
-                        <div class="icon-text">💪</div>
+                <div class="features-grid">
+                    <div class="feature-card fade-in stagger-1">
+                        <div class="feature-icon">💬</div>
+                        <h3 class="feature-title">AI Chat Support</h3>
+                        <p class="feature-description">
+                            Intelligent conversational companion powered by GPT-4, providing empathetic mental health support
+                            with context-aware responses and personalized guidance.
+                        </p>
                     </div>
-                    <div class="card-title">Physical Health</div>
-                    <div class="card-description">Log activity to boost your well-being</div>
-                </div>
 
-                <div class="card" onclick="showModal('contact')">
-                    <div class="icon-placeholder">
-                        <div class="icon-text">📞</div>
+                    <div class="feature-card fade-in stagger-2">
+                        <div class="feature-icon">🧘</div>
+                        <h3 class="feature-title">Destress & Relax</h3>
+                        <p class="feature-description">
+                            Curated collection of calming videos and music tracks with dynamic media playback,
+                            designed to help you unwind and find peace in your day.
+                        </p>
                     </div>
-                    <div class="card-title">Contact</div>
-                    <div class="card-description">Reach out for help from resources</div>
-                </div>
 
-                <div class="card" onclick="showModal('documents')">
-                    <div class="icon-placeholder">
-                        <div class="icon-text">📄</div>
+                    <div class="feature-card fade-in stagger-3">
+                        <div class="feature-icon">⏰</div>
+                        <h3 class="feature-title">Smart Reminders</h3>
+                        <p class="feature-description">
+                            Intelligent notification system for wellness check-ins and self-care reminders,
+                            helping you maintain healthy habits and stay on track.
+                        </p>
                     </div>
-                    <div class="card-title">Documents</div>
-                    <div class="card-description">Store important information</div>
+
+                    <div class="feature-card fade-in stagger-4">
+                        <div class="feature-icon">💪</div>
+                        <h3 class="feature-title">Health Tracking</h3>
+                        <p class="feature-description">
+                            Monitor your physical wellness metrics and maintain comprehensive health records
+                            that sync seamlessly across all your devices.
+                        </p>
+                    </div>
+
+                    <div class="feature-card fade-in stagger-5">
+                        <div class="feature-icon">📞</div>
+                        <h3 class="feature-title">Emergency Resources</h3>
+                        <p class="feature-description">
+                            Quick access to mental health resources and emergency contacts when you need
+                            immediate support and professional assistance.
+                        </p>
+                    </div>
+
+                    <div class="feature-card fade-in stagger-6">
+                        <div class="feature-icon">📄</div>
+                        <h3 class="feature-title">Secure Documents</h3>
+                        <p class="feature-description">
+                            Cloud-integrated document storage with Supabase, allowing you to securely
+                            store and access important information from anywhere.
+                        </p>
+                    </div>
                 </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Technology Stack</h2>
+                <p class="section-subtitle">
+                    Built with modern, industry-standard technologies for optimal performance and scalability.
+                </p>
+                <div class="tech-stack">
+                    <div class="tech-badge">React Native</div>
+                    <div class="tech-badge">Expo SDK</div>
+                    <div class="tech-badge">Expo Router</div>
+                    <div class="tech-badge">OpenAI GPT-4</div>
+                    <div class="tech-badge">Firebase Auth</div>
+                    <div class="tech-badge">Supabase</div>
+                    <div class="tech-badge">TypeScript</div>
+                    <div class="tech-badge">JavaScript ES6+</div>
+                    <div class="tech-badge">Expo AV</div>
+                    <div class="tech-badge">AsyncStorage</div>
+                    <div class="tech-badge">Push Notifications</div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h2 class="section-title" style="margin-bottom: 25px;">Explore the Source Code</h2>
+                <p class="section-subtitle" style="margin-bottom: 40px; text-align: center; margin-left: auto; margin-right: auto;">
+                    Dive into the complete implementation, architecture, and documentation on GitHub.
+                </p>
+                <a href="https://github.com/gabrielsuarezz/FrontalFriend" target="_blank" class="cta-button">
+                    View on GitHub →
+                </a>
             </div>
         </div>
 
         <div class="footer">
-            <div class="footer-text">Developed during INIT Build Mobile Development Fall 2025</div>
-            <a href="https://github.com/gabrielsuarezz/FrontalFriend" target="_blank">View Source Code on GitHub</a>
+            <p class="footer-text">Developed during INIT Build Mobile Development Fall 2025</p>
+            <div class="footer-links">
+                <a href="https://github.com/gabrielsuarezz/FrontalFriend" target="_blank">GitHub</a>
+                <a href="https://github.com/gabrielsuarezz" target="_blank">Portfolio</a>
+            </div>
         </div>
     </div>
-
-    <!-- Modal -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2 id="modal-title">Feature Demo</h2>
-            <p id="modal-description">This is a static demo of the FrontalFriend app. The full mobile app includes this feature with complete functionality.</p>
-            <button class="modal-button" onclick="closeModal()">Got it!</button>
-        </div>
-    </div>
-
-    <script>
-        const featureInfo = {
-            chat: {
-                title: 'AI Chat Support',
-                description: 'In the full app, this feature uses GPT-4 to provide empathetic mental health support with context-aware conversations.'
-            },
-            relax: {
-                title: 'Destress & Relax',
-                description: 'The mobile app includes curated calming videos and music tracks to help you relax and destress.'
-            },
-            reminders: {
-                title: 'Smart Reminders',
-                description: 'Set up wellness check-ins and self-care reminders with full notification support in the mobile app.'
-            },
-            health: {
-                title: 'Physical Health Tracking',
-                description: 'Monitor your wellness metrics and maintain health records that sync across devices.'
-            },
-            contact: {
-                title: 'Emergency Contacts',
-                description: 'Access mental health resources and emergency contacts when you need immediate support.'
-            },
-            documents: {
-                title: 'Important Documents',
-                description: 'Securely store and access important documents with Supabase cloud integration.'
-            },
-            logout: {
-                title: 'Static Demo',
-                description: 'This is a portfolio demonstration. The full mobile app includes Firebase authentication with login/logout functionality.'
-            }
-        };
-
-        function showModal(feature) {
-            const modal = document.getElementById('modal');
-            const title = document.getElementById('modal-title');
-            const description = document.getElementById('modal-description');
-
-            if (featureInfo[feature]) {
-                title.textContent = featureInfo[feature].title;
-                description.textContent = featureInfo[feature].description;
-            }
-
-            modal.classList.add('active');
-        }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
-
-        // Close modal on outside click
-        document.getElementById('modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
-    </script>
 </body>
 </html>
