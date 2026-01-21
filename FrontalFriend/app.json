@@ -24,8 +24,12 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/gradBrainnobg.png"
+      "favicon": "./assets/images/gradBrainnobg.png",
+      "bundler": "metro"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "plugins": [
       "expo-router",
       [
