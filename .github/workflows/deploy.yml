@@ -29,7 +29,7 @@ jobs:
       - name: Build web
         run: |
           cd FrontalFriend
-          npx expo export --platform web
+          EXPO_BASE_URL=/FrontalFriend npx expo export --platform web
 
       - name: Fix asset paths for GitHub Pages
         run: |
