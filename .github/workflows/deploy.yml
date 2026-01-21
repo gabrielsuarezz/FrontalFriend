@@ -16,30 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: |
-          cd FrontalFriend
-          npm install
-
-      - name: Build web
-        run: |
-          cd FrontalFriend
-          EXPO_BASE_URL=/FrontalFriend npx expo export --platform web
-
-      - name: Fix asset paths for GitHub Pages
-        run: |
-          cd FrontalFriend/dist
-          find . -name "*.html" -type f -exec sed -i 's|href="/|href="/FrontalFriend/|g' {} +
-          find . -name "*.html" -type f -exec sed -i 's|src="/|src="/FrontalFriend/|g' {} +
-          find . -name "*.js" -type f -exec sed -i 's|"/\_expo/|"/FrontalFriend/\_expo/|g' {} +
-
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./FrontalFriend/dist
+          publish_dir: ./docs
